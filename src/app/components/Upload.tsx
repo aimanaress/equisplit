@@ -36,7 +36,7 @@ export function Upload({ onOCRComplete }: UploadProps) {
 
       // Call our backend to process OCR securely (use env var for production/mobile access)
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const fetchUrl = `${apiUrl}/api/ocr`;
+      const fetchUrl = `${apiUrl}/.netlify/functions/make-server-a01cb916/ocr-process`;
       console.log('Attempting to fetch from:', fetchUrl); // Added logging
       const response = await fetch(fetchUrl, { // Changed apiUrl to fetchUrl
           method: 'POST',
