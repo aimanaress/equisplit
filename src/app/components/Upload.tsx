@@ -34,8 +34,11 @@ export function Upload({ onOCRComplete }: UploadProps) {
 
       const base64Image = reader.result as string;
 
-      // Call our local express backend to process OCR securely
-      const response = await fetch('http://localhost:3001/api/ocr', {
+      // Call our backend to process OCR securely (use env var for production/mobile access)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const fetchUrl = `${apiUrl}/api/ocr`;
+      console.log('Attempting to fetch from:', fetchUrl); // Added logging
+      const response = await fetch(fetchUrl, { // Changed apiUrl to fetchUrl
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -45,20 +48,27 @@ export function Upload({ onOCRComplete }: UploadProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
+        // Enhanced error logging and alerting
+        console.error('OCR processing failed with response:', errorData);
+        alert(`OCR processing failed: ${errorData.error || response.statusText || 'Unknown error'}`); // Added alert
         throw new Error(errorData.error || 'OCR processing failed');
       }
 
       const result = await response.json();
       
       if (!result.success) {
+        // Enhanced error logging and alerting
+        console.error('OCR processing failed with result:', result);
+        alert(`OCR processing failed: ${result.message || 'Unknown error'}`); // Added alert
         throw new Error('OCR processing failed');
       }
 
       toast.success('Receipt processed successfully!');
       onOCRComplete(base64Image, result.text);
     } catch (err) {
-      console.error('OCR error:', err);
+      console.error('OCR error in catch block:', err); // Enhanced error logging
       const errorMessage = err instanceof Error ? err.message : 'Failed to process image';
+      alert(`OCR Error: ${errorMessage}`); // Added alert for catch block errors
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
