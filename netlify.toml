@@ -5,7 +5,6 @@
 [functions]
   directory = "supabase/functions"
   deno_import_map = "import_map.json"
-  runtime = "deno"
 
 [[redirects]]
   from = "/*"
