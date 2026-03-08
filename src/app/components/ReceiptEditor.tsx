@@ -35,8 +35,8 @@ export function ReceiptEditor({ ocrText, receiptImage, onComplete }: ReceiptEdit
     let tip = 0;
     let grandTotal = 0;
 
-    // Common patterns for prices
-    const pricePattern = /\$?\s*(\d+\.?\d*)/;
+    // Common patterns for prices (supporting $, £, €, ¥, ₹, RM, etc., or no symbol)
+    const pricePattern = /(?:\$|£|€|¥|₹|RM\s*|R\$|R\s*|kr\s*)?\s*(\d+\.?\d*)/i;
     
     for (const line of lines) {
       const lowerLine = line.toLowerCase();
@@ -64,10 +64,11 @@ export function ReceiptEditor({ ocrText, receiptImage, onComplete }: ReceiptEdit
       }
 
       // Try to parse as item line (multiple patterns)
-      const itemMatch = line.match(/^(.+?)\s+[\$£€]?\s*(\d+\.\d{2})$/) || 
-                       line.match(/^(.+?)\t+[\$£€]?\s*(\d+\.\d{2})$/) ||
-                       line.match(/^(.+?)\s+(\d+\.\d{2})\s*$/) ||
-                       line.match(/^(.+?)\s+[\$£€]?\s*(\d+\.?\d*)\s*$/);
+      const currencySymbols = '(?:\\$|£|€|¥|₹|RM\\s*|R\\$|R\\s*|kr\\s*)?';
+      const itemMatch = line.match(new RegExp(`^(.+?)\\s+${currencySymbols}\\s*(\\d+\\.\\d{2})$`, 'i')) || 
+                       line.match(new RegExp(`^(.+?)\\t+${currencySymbols}\\s*(\\d+\\.\\d{2})$`, 'i')) ||
+                       line.match(new RegExp(`^(.+?)\\s+(\\d+\\.\\d{2})\\s*$`, 'i')) ||
+                       line.match(new RegExp(`^(.+?)\\s+${currencySymbols}\\s*(\\d+\\.?\\d*)\\s*$`, 'i'));
       
       if (itemMatch) {
         const name = itemMatch[1].trim();
