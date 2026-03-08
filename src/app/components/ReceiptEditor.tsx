@@ -64,8 +64,10 @@ export function ReceiptEditor({ ocrText, receiptImage, onComplete }: ReceiptEdit
       }
 
       // Try to parse as item line (multiple patterns)
-      const itemMatch = line.match(/^(.+?)\s+\$?\s*(\d+\.?\d*)$/) || 
-                       line.match(/^(.+?)\s+(\d+\.\d{2})$/);
+      const itemMatch = line.match(/^(.+?)\s+[\$£€]?\s*(\d+\.\d{2})$/) || 
+                       line.match(/^(.+?)\t+[\$£€]?\s*(\d+\.\d{2})$/) ||
+                       line.match(/^(.+?)\s+(\d+\.\d{2})\s*$/) ||
+                       line.match(/^(.+?)\s+[\$£€]?\s*(\d+\.?\d*)\s*$/);
       
       if (itemMatch) {
         const name = itemMatch[1].trim();

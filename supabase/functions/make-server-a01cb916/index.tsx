@@ -52,6 +52,7 @@ app.post("*", async (c) => {
     formData.append("isOverlayRequired", "false");
     formData.append("detectOrientation", "true");
     formData.append("scale", "true");
+    formData.append("isTable", "true");
     formData.append("OCREngine", "2"); // Use OCR Engine 2 for better accuracy
 
     const ocrResponse = await fetch("https://api.ocr.space/parse/image", {
