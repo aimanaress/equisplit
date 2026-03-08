@@ -34,8 +34,8 @@ export function Upload({ onOCRComplete }: UploadProps) {
 
       const base64Image = reader.result as string;
 
-      // Call our backend to process OCR securely (use env var for production/mobile access)
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      // Call our backend to process OCR securely (use env var or relative path for production)
+      const apiUrl = import.meta.env.DEV ? (import.meta.env.VITE_API_URL || 'http://localhost:3001') : '';
       const fetchUrl = `${apiUrl}/.netlify/functions/make-server-a01cb916/ocr-process`;
       console.log('Attempting to fetch from:', fetchUrl); // Added logging
       const response = await fetch(fetchUrl, { // Changed apiUrl to fetchUrl

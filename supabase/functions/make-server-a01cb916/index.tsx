@@ -25,7 +25,7 @@ app.get("/make-server-a01cb916/health", (c) => {
 });
 
 // OCR endpoint - processes receipt images using OCR.space API
-app.post("/make-server-a01cb916/ocr-process", async (c) => {
+app.post("*", async (c) => {
   try {
     const body = await c.req.json();
     const { image } = body;
@@ -34,11 +34,15 @@ app.post("/make-server-a01cb916/ocr-process", async (c) => {
       return c.json({ error: "No image provided" }, 400);
     }
 
-    // Get API key from environment
-    const apiKey = Deno.env.get("OCR_SPACE_API_KEY");
+    // Try different runtime env retrieval methods
+    let apiKey: string | undefined = undefined;
+    if (typeof Deno !== "undefined") { apiKey = Deno.env.get("OCR_SPACE_API_KEY"); }
+    else if (typeof process !== "undefined") { apiKey = process.env["OCR_SPACE_API_KEY"]; }
+    else if (typeof Netlify !== "undefined") { apiKey = Netlify.env.get("OCR_SPACE_API_KEY"); }
+
     if (!apiKey) {
       console.error("OCR processing error: OCR_SPACE_API_KEY not configured");
-      return c.json({ error: "OCR API key not configured" }, 500);
+      return c.json({ error: "OCR API key not configured. Make sure it's set in your Netlify dashboard." }, 500);
     }
 
     // Call OCR.space API
@@ -76,10 +80,11 @@ app.post("/make-server-a01cb916/ocr-process", async (c) => {
       rawResult: ocrResult,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("OCR endpoint error:", error);
     return c.json({ error: `OCR processing failed: ${error.message}` }, 500);
   }
 });
 
-Deno.serve(app.fetch);
+// Netlify Functions expect a default export for the Request handler
+export default app.fetch;
